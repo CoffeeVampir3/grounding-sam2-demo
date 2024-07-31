@@ -56,6 +56,24 @@ def sam_seg_rects(sam_model, point_coords, point_labels, image, boxes):
 
     return all_masks
 
+def get_font(font_size):
+    # List of common fonts to try
+    font_names = [
+        "DejaVuSans.ttf",
+        "Arial.ttf",
+        "Helvetica.ttf",
+        "Verdana.ttf",
+        "FreeSans.ttf",  # Common on Linux
+    ]
+    
+    for font_name in font_names:
+        try:
+            return ImageFont.truetype(font=font_name, size=font_size)
+        except IOError:
+            continue
+    
+    return ImageFont.load_default()
+
 def plot_boxes_to_image(image_pil, tgt):
     H, W = tgt["size"]
     boxes = tgt["boxes"]
@@ -66,8 +84,9 @@ def plot_boxes_to_image(image_pil, tgt):
     mask = Image.new("L", image_pil.size, 0)
     mask_draw = ImageDraw.Draw(mask)
 
-    font_size = 36  # Adjust the font size as needed
-    font = ImageFont.truetype(font="DejaVuSans.ttf", size=font_size)
+    font_size = 36
+
+    font = get_font(font_size)
 
     # draw boxes and masks
     for box, label in zip(boxes, labels):
